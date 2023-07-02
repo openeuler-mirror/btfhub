@@ -52,7 +52,7 @@ func (job *KernelExtractionJob) Do(ctx context.Context) error {
 	err = job.Pkg.ExtractKernel(ctx, kernPkgPath, vmlinuxPath)
 	if err != nil {
 		os.Remove(vmlinuxPath)
-		return fmt.Errorf("extracting vmlinux from %s: %s", vmlinuxPath, err)
+		return fmt.Errorf("extracting vmlinux from %s: %s", kernPkgPath, err)
 	}
 
 	log.Printf("DEBUG: finished extracting from %s in %s\n", kernPkgPath, time.Since(extractStart))
