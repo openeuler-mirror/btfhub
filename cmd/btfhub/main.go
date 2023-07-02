@@ -17,25 +17,27 @@ import (
 )
 
 var distroReleases = map[string][]string{
-	"ubuntu": {"xenial", "bionic", "focal"},
-	"debian": {"stretch", "buster", "bullseye"},
-	"fedora": {"24", "25", "26", "27", "28", "29", "30", "31"},
-	"centos": {"7", "8"},
-	"ol":     {"7", "8"},
-	"rhel":   {"7", "8"},
-	"amzn":   {"1", "2"},
+	"ubuntu":    {"xenial", "bionic", "focal"},
+	"debian":    {"stretch", "buster", "bullseye"},
+	"fedora":    {"24", "25", "26", "27", "28", "29", "30", "31"},
+	"centos":    {"7", "8"},
+	"ol":        {"7", "8"},
+	"rhel":      {"7", "8"},
+	"amzn":      {"1", "2"},
+	"openEuler": {"20.03-LTS-SP3", "22.03-LTS", "22.03-LTS-SP1", "22.03-LTS-SP2", "23.03"},
 }
 
 type repoFunc func() repo.Repository
 
 var repoCreators = map[string]repoFunc{
-	"ubuntu": repo.NewUbuntuRepo,
-	"debian": repo.NewDebianRepo,
-	"fedora": repo.NewFedoraRepo,
-	"centos": repo.NewCentOSRepo,
-	"ol":     repo.NewOracleRepo,
-	"rhel":   repo.NewRHELRepo,
-	"amzn":   repo.NewAmazonRepo,
+	"ubuntu":    repo.NewUbuntuRepo,
+	"debian":    repo.NewDebianRepo,
+	"fedora":    repo.NewFedoraRepo,
+	"centos":    repo.NewCentOSRepo,
+	"ol":        repo.NewOracleRepo,
+	"rhel":      repo.NewRHELRepo,
+	"amzn":      repo.NewAmazonRepo,
+	"openEuler": repo.NewOpenEulerRepo,
 }
 
 var distro, release, arch string
