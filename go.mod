@@ -1,4 +1,4 @@
-module github.com/aquasecurity/btfhub
+module gitee.com/openeuler/btfhub
 
 go 1.19
 

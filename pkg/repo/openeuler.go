@@ -9,10 +9,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/aquasecurity/btfhub/pkg/job"
-	"github.com/aquasecurity/btfhub/pkg/kernel"
-	"github.com/aquasecurity/btfhub/pkg/pkg"
-	"github.com/aquasecurity/btfhub/pkg/utils"
+	"gitee.com/openeuler/btfhub/pkg/job"
+	"gitee.com/openeuler/btfhub/pkg/kernel"
+	"gitee.com/openeuler/btfhub/pkg/pkg"
+	"gitee.com/openeuler/btfhub/pkg/utils"
 )
 
 type OpenEulerRepo struct {

@@ -3,7 +3,7 @@ package job
 import (
 	"context"
 
-	"github.com/aquasecurity/btfhub/pkg/utils"
+	"gitee.com/openeuler/btfhub/pkg/utils"
 )
 
 // GenerateBTF generates a BTF file from a vmlinux file

@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/aquasecurity/btfhub/pkg/pkg"
+	"gitee.com/openeuler/btfhub/pkg/pkg"
 )
 
 type BTFGenerationJob struct {

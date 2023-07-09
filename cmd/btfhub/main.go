@@ -11,8 +11,8 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/aquasecurity/btfhub/pkg/job"
-	"github.com/aquasecurity/btfhub/pkg/repo"
+	"gitee.com/openeuler/btfhub/pkg/job"
+	"gitee.com/openeuler/btfhub/pkg/repo"
 	"golang.org/x/sync/errgroup"
 )
 

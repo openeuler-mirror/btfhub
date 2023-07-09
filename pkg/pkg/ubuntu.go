@@ -12,8 +12,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/aquasecurity/btfhub/pkg/kernel"
-	"github.com/aquasecurity/btfhub/pkg/utils"
+	"gitee.com/openeuler/btfhub/pkg/kernel"
+	"gitee.com/openeuler/btfhub/pkg/utils"
 	"pault.ag/go/debian/deb"
 )
 

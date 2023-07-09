@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/aquasecurity/btfhub/pkg/pkg"
-	"github.com/aquasecurity/btfhub/pkg/utils"
+	"gitee.com/openeuler/btfhub/pkg/pkg"
+	"gitee.com/openeuler/btfhub/pkg/utils"
 )
 
 type KernelExtractionJob struct {
