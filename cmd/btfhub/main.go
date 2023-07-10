@@ -24,7 +24,7 @@ var distroReleases = map[string][]string{
 	"ol":        {"7", "8"},
 	"rhel":      {"7", "8"},
 	"amzn":      {"1", "2"},
-	"openEuler": {"20.03-LTS-SP3", "22.03-LTS", "22.03-LTS-SP1", "22.03-LTS-SP2", "23.03"},
+	"openEuler": {"20.03", "22.03", "23.03"},
 }
 
 type repoFunc func() repo.Repository

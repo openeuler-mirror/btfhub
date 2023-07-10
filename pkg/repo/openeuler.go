@@ -16,8 +16,9 @@ import (
 )
 
 type OpenEulerRepo struct {
-	archs map[string]string
-	repos map[string]string
+	archs        map[string]string
+	releases     map[string][]string
+	repoTemplate string
 }
 
 func NewOpenEulerRepo() Repository {
@@ -27,13 +28,21 @@ func NewOpenEulerRepo() Repository {
 			"x86_64": "x86_64",
 			"arm64":  "aarch64",
 		},
-		repos: map[string]string{
-			"20.03-LTS-SP3": "https://repo.openeuler.org/openEuler-20.03-LTS-SP3/debuginfo/%s/Packages/",
-			"22.03-LTS":     "https://repo.openeuler.org/openEuler-22.03-LTS/debuginfo/%s/Packages/",
-			"22.03-LTS-SP1": "https://repo.openeuler.org/openEuler-22.03-LTS-SP1/debuginfo/%s/Packages/",
-			"22.03-LTS-SP2": "https://repo.openeuler.org/openEuler-22.03-LTS-SP2/debuginfo/%s/Packages/",
-			"23.03":         "https://repo.openeuler.org/openEuler-23.03/debuginfo/%s/Packages/", // FIXME: vmlinux does not exist in kernel-debuginfo
+		releases: map[string][]string{
+			"20.03": {
+				"20.03-LTS-SP3",
+			},
+			"22.03": {
+				"22.03-LTS",
+				"22.03-LTS-SP1",
+				"22.03-LTS-SP2",
+			},
+			"23.03": {
+				// FIXME: vmlinux does not exist in kernel-debuginfo
+				"23.03",
+			},
 		},
+		repoTemplate: "https://repo.openeuler.org/openEuler-%s/debuginfo/%s/Packages/",
 	}
 }
 
@@ -47,11 +56,16 @@ func (d *OpenEulerRepo) GetKernelPackages(
 	var pkgs []pkg.Package
 
 	altArch := d.archs[arch]
-	repoURL := fmt.Sprintf(d.repos[release], altArch)
+	altReleases := d.releases[release]
 
-	links, err := utils.GetLinks(repoURL)
-	if err != nil {
-		return fmt.Errorf("ERROR: list packages, %s", err)
+	var links []string
+	for _, altRelease := range altReleases {
+		repoURL := fmt.Sprintf(d.repoTemplate, altRelease, altArch)
+		repoLinks, err := utils.GetLinks(repoURL)
+		if err != nil {
+			return fmt.Errorf("ERROR: list packages, %s", err)
+		}
+		links = append(links, repoLinks...)
 	}
 
 	kre := regexp.MustCompile(fmt.Sprintf(`kernel-debuginfo-([-1-9].*\.%s)\.rpm`, altArch))
