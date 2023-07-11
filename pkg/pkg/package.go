@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/aquasecurity/btfhub/pkg/kernel"
-	"github.com/aquasecurity/btfhub/pkg/utils"
+	"gitee.com/openeuler/btfhub/pkg/kernel"
+	"gitee.com/openeuler/btfhub/pkg/utils"
 )
 
 type Package interface {

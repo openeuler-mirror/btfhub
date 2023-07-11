@@ -3,7 +3,7 @@ package repo
 import (
 	"context"
 
-	"github.com/aquasecurity/btfhub/pkg/job"
+	"gitee.com/openeuler/btfhub/pkg/job"
 )
 
 type Repository interface {

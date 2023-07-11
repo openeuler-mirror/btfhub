@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/aquasecurity/btfhub/pkg/pkg"
-	"github.com/aquasecurity/btfhub/pkg/utils"
+	"gitee.com/openeuler/btfhub/pkg/pkg"
+	"gitee.com/openeuler/btfhub/pkg/utils"
 )
 
 type KernelExtractionJob struct {
@@ -52,7 +52,7 @@ func (job *KernelExtractionJob) Do(ctx context.Context) error {
 	err = job.Pkg.ExtractKernel(ctx, kernPkgPath, vmlinuxPath)
 	if err != nil {
 		os.Remove(vmlinuxPath)
-		return fmt.Errorf("extracting vmlinux from %s: %s", vmlinuxPath, err)
+		return fmt.Errorf("extracting vmlinux from %s: %s", kernPkgPath, err)
 	}
 
 	log.Printf("DEBUG: finished extracting from %s in %s\n", kernPkgPath, time.Since(extractStart))

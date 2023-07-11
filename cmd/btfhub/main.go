@@ -11,31 +11,33 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/aquasecurity/btfhub/pkg/job"
-	"github.com/aquasecurity/btfhub/pkg/repo"
+	"gitee.com/openeuler/btfhub/pkg/job"
+	"gitee.com/openeuler/btfhub/pkg/repo"
 	"golang.org/x/sync/errgroup"
 )
 
 var distroReleases = map[string][]string{
-	"ubuntu": {"xenial", "bionic", "focal"},
-	"debian": {"stretch", "buster", "bullseye"},
-	"fedora": {"24", "25", "26", "27", "28", "29", "30", "31"},
-	"centos": {"7", "8"},
-	"ol":     {"7", "8"},
-	"rhel":   {"7", "8"},
-	"amzn":   {"1", "2"},
+	"ubuntu":    {"xenial", "bionic", "focal"},
+	"debian":    {"stretch", "buster", "bullseye"},
+	"fedora":    {"24", "25", "26", "27", "28", "29", "30", "31"},
+	"centos":    {"7", "8"},
+	"ol":        {"7", "8"},
+	"rhel":      {"7", "8"},
+	"amzn":      {"1", "2"},
+	"openEuler": {"20.03", "22.03", "23.03"},
 }
 
 type repoFunc func() repo.Repository
 
 var repoCreators = map[string]repoFunc{
-	"ubuntu": repo.NewUbuntuRepo,
-	"debian": repo.NewDebianRepo,
-	"fedora": repo.NewFedoraRepo,
-	"centos": repo.NewCentOSRepo,
-	"ol":     repo.NewOracleRepo,
-	"rhel":   repo.NewRHELRepo,
-	"amzn":   repo.NewAmazonRepo,
+	"ubuntu":    repo.NewUbuntuRepo,
+	"debian":    repo.NewDebianRepo,
+	"fedora":    repo.NewFedoraRepo,
+	"centos":    repo.NewCentOSRepo,
+	"ol":        repo.NewOracleRepo,
+	"rhel":      repo.NewRHELRepo,
+	"amzn":      repo.NewAmazonRepo,
+	"openEuler": repo.NewOpenEulerRepo,
 }
 
 var distro, release, arch string
