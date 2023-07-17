@@ -1,16 +1,26 @@
 #!/usr/bin/env bash
 
-set -e
+# Create a PR for BTF updates on Gitee. The API token is provided in
+# $BTFHUB_GITEE_API_TOKEN. It is required to provide the path to the local
+# BTFHub Archive repository with $BTFHUB_ARCHIVE_DIR. Parameters required to
+# create the PR (repository owner and name, base and head branches, title and
+# body) can be controlled by environment variables, and will be filled 
+# automatically based on the status of the local BTFHub Archive repository if
+# not provided.
 
-SCRIPT_NAME="$(basename "$0")"
+set -e
+set -o pipefail
+source "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/common.sh"
+
 GITEE_API_BASE_URL="https://gitee.com/api/v5"
 
-info() {
-    echo "$SCRIPT_NAME: info:" "$@"
-}
-
-error() {
-    echo "$SCRIPT_NAME: error:" "$@"
+prepare_local_repo() {
+    if [[ -z "$BTFHUB_ARCHIVE_DIR" ]]; then
+        error "missing required BTFHUB_ARCHIVE_DIR"
+        exit 1
+    fi
+    cd "$BTFHUB_ARCHIVE_DIR"
+    info "using local BTFHub Archive repository at $(pwd)"
 }
 
 prepare_api_token() {
@@ -21,7 +31,7 @@ prepare_api_token() {
     info "using BTFHUB_GITEE_API_TOKEN: $BTFHUB_GITEE_API_TOKEN"
 }
 
-prepare_archive_repo() {
+prepare_repo_owner_name() {
     if [[ -z "$BTFHUB_ARCHIVE_REPO" ]]; then
         BTFHUB_ARCHIVE_REPO="$(git remote get-url origin \
             | sed 's/^https:\/\/gitee.com\///' \
@@ -106,8 +116,9 @@ do_create_pr() {
 prepare_variables() {
     info "preparing variables"
 
+    prepare_local_repo
     prepare_api_token
-    prepare_archive_repo
+    prepare_repo_owner_name
     prepare_pr_head
     prepare_pr_base
     prepare_pr_title
