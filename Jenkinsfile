@@ -25,7 +25,13 @@ pipeline {
             defaultValue: 'openeuler-btfhub-git-author-email')
         string(name: 'BTFHUB_GITEE_CREDENTIAL_ID',
             description: 'Credentail ID for authentication with Gitee',
-            defaultValue: 'gitee-hanlinyang-username-password')
+            defaultValue: 'BTFHub-robot')
+    }
+
+    environment {
+        // Override the default locale to avoid some locale-related issues,
+        // such as inconsistent sort order of strings
+        LC_ALL = 'C.UTF-8'
     }
 
     stages {
@@ -48,20 +54,6 @@ pipeline {
                                     name: 'origin',
                                     url: params.BTFHUB_ARCHIVE_REPO_URL]],
                                 extensions: [ localBranch() ])
-
-                            withCredentials([
-                                string(
-                                    credentialsId: params.BTFHUB_GIT_AUTHOR_NAME_CREDENTIAL_ID,
-                                    variable: 'BTFHUB_GIT_AUTHOR_NAME'),
-                                string(
-                                    credentialsId: params.BTFHUB_GIT_AUTHOR_EMAIL_CREDENTIAL_ID,
-                                    variable: 'BTFHUB_GIT_AUTHOR_EMAIL') ]) {
-                                sh 'git config --local user.name "$BTFHUB_GIT_AUTHOR_NAME"'
-                                sh 'git config --local user.email "$BTFHUB_GIT_AUTHOR_EMAIL"'
-                            }
-
-                            sh 'git rebase origin/master'
-                            sh "git branch --set-upstream-to origin/${params.BTFHUB_ARCHIVE_BUILD_BRANCH}"
                         }
                     }
                 }
@@ -70,79 +62,55 @@ pipeline {
 
         stage('Build builder image') {
             steps {
-                dir('btfhub') {
-                    sh 'docker build -t openeuler-btfhub-ci-builder - < tools/ci/Dockerfile'
-                }
+                sh 'btfhub/tools/ci/build-builder.sh'
+            }
+        }
 
-                script {
-                    uid = sh(script: 'id -u', returnStdout: true).trim()
-                    gid = sh(script: 'id -g', returnStdout: true).trim()
-                    env.RUN_IN_BUILDER = """
-                    docker run \
-                        --rm \
-                        -u ${uid}:${gid} \
-                        -v ${env.WORKSPACE}:/workspace \
-                        -w /workspace \
-                        openeuler-btfhub-ci-builder \
-                    """
+        stage('Prepare build environment') {
+            steps {
+                withCredentials([
+                    string(
+                        credentialsId: params.BTFHUB_GIT_AUTHOR_NAME_CREDENTIAL_ID,
+                        variable: 'BTFHUB_GIT_AUTHOR_NAME'),
+                    string(
+                        credentialsId: params.BTFHUB_GIT_AUTHOR_EMAIL_CREDENTIAL_ID,
+                        variable: 'BTFHUB_GIT_AUTHOR_EMAIL') ]) {
+                    sh '''
+                    btfhub/tools/ci/run-in-builder.sh env \
+                        BTFHUB_GIT_AUTHOR_NAME="$BTFHUB_GIT_AUTHOR_NAME" \
+                        BTFHUB_GIT_AUTHOR_EMAIL="$BTFHUB_GIT_AUTHOR_EMAIL" \
+                        BTFHUB_ARCHIVE_BUILD_BRANCH="$BTFHUB_ARCHIVE_BUILD_BRANCH" \
+                        btfhub/tools/ci/prepare-environment.sh
+                    '''
                 }
             }
         }
 
-        stage('Inspect build environment') {
+        stage('Generate BTF files (openEuler)') {
             steps {
-                sh 'uname -a'
-                sh 'docker version'
-                sh 'git --version'
-                sh '''
-                $RUN_IN_BUILDER bash -x -c " \
-                    uname -a && \
-                    clang --version && \
-                    find --version && \
-                    git --version && \
-                    go version && \
-                    jq --version && \
-                    make --version && \
-                    pahole --version && \
-                    rsync --version && \
-                    xargs --version && \
-                    xz --version"
-                '''
+                sh 'btfhub/tools/ci/run-in-builder.sh btfhub/tools/ci/generate-btf.sh -distro openEuler'
             }
         }
 
-        stage('Generate BTF files') {
+        stage('Validate BTF files') {
             steps {
-                sh '''
-                $RUN_IN_BUILDER bash -x -c " \
-                    cd btfhub && \
-                    make bring && \
-                    make && \
-                    ./btfhub -distro openEuler && \
-                    make take"
-                '''
+                sh 'btfhub/tools/ci/run-in-builder.sh btfhub/tools/ci/validate-btf.sh'
             }
         }
 
         stage('Commit, push & create PR') {
             steps {
-                dir('btfhub-archive') {
-                    sh 'git add -A'
-                    sh 'git status'
+                withCredentials([ usernamePassword(
+                    credentialsId: params.BTFHUB_GITEE_CREDENTIAL_ID,
+                    usernameVariable: 'BTFHUB_GIT_USERNAME',
+                    passwordVariable: 'BTFHUB_GIT_PASSWORD') ]) {
                     sh '''
-                    git diff-index --quiet HEAD || \
-                    ( printf '%s\\n' \
-                        "Update BTFHub Archive" \
-                        "" \
-                        "This commit is created by an automated build process; see also <$BUILD_URL>." \
-                    | git commit -F - ) && \
-                    git log -1
+                    btfhub/tools/ci/run-in-builder.sh env \
+                        BTFHUB_GIT_USERNAME="$BTFHUB_GIT_USERNAME" \
+                        BTFHUB_GIT_PASSWORD="$BTFHUB_GIT_PASSWORD" \
+                        BUILD_URL="$BUILD_URL" \
+                        btfhub/tools/ci/commit-push.sh
                     '''
-
-                    withCredentials([
-                        gitUsernamePassword(credentialsId: params.BTFHUB_GITEE_CREDENTIAL_ID) ]) {
-                        sh 'git push --force-with-lease'
-                    }
                 }
 
                 withCredentials([ usernamePassword(
@@ -150,12 +118,11 @@ pipeline {
                     usernameVariable: '_UNUSED',
                     passwordVariable: 'BTFHUB_GITEE_API_TOKEN') ]) {
                     sh '''
-                    $RUN_IN_BUILDER bash -x -c " \
-                        cd btfhub-archive && \
+                    btfhub/tools/ci/run-in-builder.sh env \
                         BTFHUB_GITEE_API_TOKEN="$BTFHUB_GITEE_API_TOKEN" \
                         JOB_NAME="$JOB_NAME" \
                         JOB_URL="$JOB_URL" \
-                        ../btfhub/tools/ci/create-pr.sh"
+                        btfhub/tools/ci/create-pr.sh
                     '''
                 }
             }
