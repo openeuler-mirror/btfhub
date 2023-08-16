@@ -12,6 +12,8 @@ openEuler BTF 管理基础设施为 openEuler 系统多个版本内核提供预�
 
 openEuler BTF 管理基础设施 BTF 资源归档仓位于 [`openeuler/btfhub-archive` 仓库](https://gitee.com/openeuler/btfhub-archive)，提供了为 openEuler 系统内核预构建的 BTF 文件，可供直接下载使用。本仓库仅包含 BTF 构建工具源码以及 openEuler BTF 管理基础设施相关配置、文档。
 
+预构建的 BTF 使用说明请见[使用说明](docs/prebuilt-btf-usage.md)文档。
+
 预构建的 BTF 所覆盖的 openEuler 系统版本可参见[支持版本](docs/supported-versions.md)文档。
 
 ### 构建 BTF
