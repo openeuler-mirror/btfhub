@@ -100,6 +100,7 @@ var CanGenerateBTFCreators = map[string]CanGenerateBTFCreator {
 | `repos` | `[]string` | Y | YUM debuginfo 仓库 URL；可以指定多个 URL，以适配多个 debuginfo 仓库场景（如 openEuler 22.03） |
 | `filters.regex` | `string` | - | 正则表达式；用于筛选出 `kernel-debuginfo` 包并提取内核版本
 | `filters.minVersion` | `string` | - | 支持的最小内核版本；适配 CentOS、Oracle Linux 同一发行版 release 下内核版本过多的场景 |
+| `filters.skipEmbeddedBTF` | `bool` | - | 是否跳过自带 BTF 内核；默认为 `true` |
 
 #### 基于 `yum` 工具生成 BTF 通用实现
 
@@ -118,6 +119,7 @@ Amazon Linux 与 RHEL 所使用的 YUM 仓库似乎无法直接访问、下载 Y
 | `commands.prepare` | `string` | - | 搜索前执行的命令；适配 RHEL 搜索前需要执行 `subscription-manager release --set=...` 的场景 |
 | `commands.search` | `string` | - | 利用 `yum` 搜索 `kernel-debuginfo` 使用的命令 |
 | `commands.download` | `string` | - | 下载指定 `kernel-debuginfo` 包使用的命令 |
+| `filters.skipEmbeddedBTF` | `bool` | - | 是否跳过自带 BTF 内核；默认为 `true` |
 
 #### 基于 APT 仓库生成 BTF 通用实现
 
@@ -135,6 +137,7 @@ Amazon Linux 与 RHEL 所使用的 YUM 仓库似乎无法直接访问、下载 Y
 | ----- | ---- | --- | ---- |
 | `repos` | `[]string` | Y | 包含调试符号包的 APT 仓库 URL；可以指定多个 URL |
 | `filters.regex` | `string` | - | 正则表达式；用于筛选出内核调试符号包，并提取内核版本 |
+| `filters.skipEmbeddedBTF` | `bool` | - | 是否跳过自带 BTF 内核；默认为 `true` |
 
 #### 为 Ubuntu 生成 BTF 实现
 
@@ -155,3 +158,4 @@ Amazon Linux 与 RHEL 所使用的 YUM 仓库似乎无法直接访问、下载 Y
 | `repos.debug` | `string` | - | 包含调试符号包的 APT 仓库 URL |
 | `filters.regex` | `string` | - | 正则表达式；用于筛选出内核调试符号包 |
 | `filters.minSize` | `int` | - | 内核调试符号包最小大小；用于过滤签名后的内核对应的空调试符号包 |
+| `filters.skipEmbeddedBTF` | `bool` | - | 是否跳过自带 BTF 内核；默认为 `true` |
