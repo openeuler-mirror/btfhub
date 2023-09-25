@@ -41,6 +41,10 @@ func (pkg *UbuntuPackage) Version() kernel.Version {
 	return pkg.KernelVersion
 }
 
+func (pkg *UbuntuPackage) SkipExistingBTF() bool {
+	return true
+}
+
 func (pkg *UbuntuPackage) String() string {
 	return fmt.Sprintf("%s %s", pkg.Name, pkg.Architecture)
 }

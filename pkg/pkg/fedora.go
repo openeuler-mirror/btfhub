@@ -26,6 +26,10 @@ func (pkg *FedoraPackage) Version() kernel.Version {
 	return pkg.KernelVersion
 }
 
+func (pkg *FedoraPackage) SkipExistingBTF() bool {
+	return true
+}
+
 func (pkg *FedoraPackage) String() string {
 	return pkg.Name
 }
