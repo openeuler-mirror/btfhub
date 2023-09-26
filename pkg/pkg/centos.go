@@ -26,6 +26,10 @@ func (pkg *CentOSPackage) Version() kernel.Version {
 	return pkg.KernelVersion
 }
 
+func (pkg *CentOSPackage) SkipExistingBTF() bool {
+	return true
+}
+
 func (pkg *CentOSPackage) String() string {
 	return pkg.Name
 }

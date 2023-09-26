@@ -117,14 +117,16 @@ func processPackage(
 
 	// Check if BTF is already present in vmlinux (will skip further packages)
 
-	hasBTF, err := utils.HasBTFSection(vmlinuxPath)
-	if err != nil {
-		return fmt.Errorf("BTF check: %s", err)
-	}
-	if hasBTF {
-		// Removing here is bad for re-runs (it has to re-download)
-		os.Remove(vmlinuxPath)
-		return utils.ErrHasBTF
+	if pkg.SkipExistingBTF() {
+		hasBTF, err := utils.HasBTFSection(vmlinuxPath)
+		if err != nil {
+			return fmt.Errorf("BTF check: %s", err)
+		}
+		if hasBTF {
+			// Removing here is bad for re-runs (it has to re-download)
+			os.Remove(vmlinuxPath)
+			return utils.ErrHasBTF
+		}
 	}
 
 	// 2nd job: Generate BTF file from vmlinux file

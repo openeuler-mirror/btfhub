@@ -13,6 +13,7 @@ type Package interface {
 	String() string
 	Filename() string
 	Version() kernel.Version
+	SkipExistingBTF() bool
 	Download(ctx context.Context, dir string) (string, error)
 	ExtractKernel(ctx context.Context, pkgpath string, vmlinuxPath string) error
 }

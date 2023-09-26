@@ -26,6 +26,10 @@ func (pkg *RHELPackage) Version() kernel.Version {
 	return pkg.KernelVersion
 }
 
+func (pkg *RHELPackage) SkipExistingBTF() bool {
+	return true
+}
+
 func (pkg *RHELPackage) String() string {
 	return pkg.Name
 }
