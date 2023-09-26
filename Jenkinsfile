@@ -25,7 +25,7 @@ pipeline {
             defaultValue: 'openeuler-btfhub-git-author-email')
         string(name: 'BTFHUB_GITEE_CREDENTIAL_ID',
             description: 'Credentail ID for authentication with Gitee',
-            defaultValue: 'gitee-hanlinyang-username-password')
+            defaultValue: 'BTFHub-robot')
     }
 
     environment {
