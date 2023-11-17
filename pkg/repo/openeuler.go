@@ -15,6 +15,11 @@ import (
 	"gitee.com/openeuler/btfhub/pkg/utils"
 )
 
+const (
+	debugInfo = "debuginfo"
+	update    = "update"
+)
+
 type OpenEulerRepo struct {
 	archs        map[string]string
 	releases     map[string][]string
@@ -30,6 +35,7 @@ func NewOpenEulerRepo() Repository {
 		},
 		releases: map[string][]string{
 			"20.03": {
+				"20.03-LTS-SP1",
 				"20.03-LTS-SP3",
 			},
 			"22.03": {
@@ -42,7 +48,7 @@ func NewOpenEulerRepo() Repository {
 				"23.03",
 			},
 		},
-		repoTemplate: "https://repo.openeuler.org/openEuler-%s/debuginfo/%s/Packages/",
+		repoTemplate: "https://repo.openeuler.org/openEuler-%s/%s/%s/Packages/",
 	}
 }
 
@@ -58,15 +64,17 @@ func (d *OpenEulerRepo) GetKernelPackages(
 	altArch := d.archs[arch]
 	altReleases := d.releases[release]
 
-	var links []string
-	for _, altRelease := range altReleases {
-		repoURL := fmt.Sprintf(d.repoTemplate, altRelease, altArch)
-		repoLinks, err := utils.GetLinks(repoURL)
-		if err != nil {
-			return fmt.Errorf("ERROR: list packages, %s", err)
-		}
-		links = append(links, repoLinks...)
+	debugInfolinks, err := d.getRepoDebugInfoLinks(altReleases, altArch)
+	if err != nil {
+		return err
 	}
+
+	updateLinks, err := d.getRepoUpdateLinks(altReleases, altArch)
+	if err != nil {
+		return err
+	}
+
+	links := append(debugInfolinks, updateLinks...)
 
 	kre := regexp.MustCompile(fmt.Sprintf(`kernel-debuginfo-([-1-9].*\.%s)\.rpm`, altArch))
 
@@ -106,4 +114,34 @@ func (d *OpenEulerRepo) GetKernelPackages(
 	}
 
 	return nil
+}
+
+func (d *OpenEulerRepo) getRepoDebugInfoLinks(altReleases []string, altArch string) ([]string, error) {
+	var debugInfolinks []string
+
+	for _, altRelease := range altReleases {
+		repoURL := fmt.Sprintf(d.repoTemplate, altRelease, debugInfo, altArch)
+		repoLinks, err := utils.GetLinks(repoURL)
+		if err != nil {
+			return nil, fmt.Errorf("ERROR: list packages, %s", err)
+		}
+		debugInfolinks = append(debugInfolinks, repoLinks...)
+	}
+
+	return debugInfolinks, nil
+}
+
+func (d *OpenEulerRepo) getRepoUpdateLinks(altReleases []string, altArch string) ([]string, error) {
+	var updateLinks []string
+
+	for _, altRelease := range altReleases {
+		repoURL := fmt.Sprintf(d.repoTemplate, altRelease, update, altArch)
+		repoLinks, err := utils.GetLinks(repoURL)
+		if err != nil {
+			return nil, fmt.Errorf("ERROR: updatelist packages, %s", err)
+		}
+		updateLinks = append(updateLinks, repoLinks...)
+	}
+
+	return updateLinks, nil
 }
